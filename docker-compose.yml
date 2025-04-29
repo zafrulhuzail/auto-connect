@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  dev:
+    build: .
+    volumes:
+      - .:/workspace
+    tmpfs:
+      - /tmp
+    cap_add:
+      - NET_ADMIN  # Required for iptables
+      - SYS_ADMIN  # Required for cgroups
+    security_opt:
+      - seccomp:unconfined  # For seccomp development
+    tty: true
+    stdin_open: true
