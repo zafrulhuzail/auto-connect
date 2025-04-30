@@ -8,7 +8,7 @@ This program acts like a **"brain" for a smart car**, with 3 main jobs:
 2. **📡 Networking** - Checks internet connections (WiFi/cellular)
 3. **🔋 Power Management** - Monitors battery level
 
-## 🛠️ How It Works (For Beginners)
+## 🛠️ How It Works
 | File               | What It Does                          | Real Car Example                 |
 |--------------------|---------------------------------------|----------------------------------|
 | `daemon.cpp`       | Main controller (like a dashboard)    | Runs everything in a loop        |
@@ -22,3 +22,29 @@ This program acts like a **"brain" for a smart car**, with 3 main jobs:
    ```bash
    docker-compose build
    docker-compose run --rm dev
+3. Update and install dependencies (inside container/on Ubuntu)
+apt-get update && apt-get install -y libseccomp-dev
+
+4. Build fresh
+cmake ..
+make
+5. Run executable file
+./connectivity-daemon
+
+## 🛠️ How to clean
+1. Clean everything
+    ```bash
+    rm -rf /workspace/build/*
+    cd /workspace
+2. Update and install dependencies
+    ```bash
+    apt-get update && apt-get install -y libseccomp-dev
+3. Build fresh
+    ```bash 
+    mkdir -p build
+    cd build
+    cmake ..
+    make
+4. Run executable file
+    ```bash
+    ./connectivity-daemon
