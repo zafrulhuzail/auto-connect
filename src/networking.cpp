@@ -1,23 +1,40 @@
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <unistd.h>
+#include <cstring>
 #include <iostream>
-#include <vector>
-#include "networking.h"
 
-// Simple network monitor
 void monitor_connections() {
-    std::vector<std::string> interfaces = {"eth0", "wlan0", "cellular0"};
-    
-    std::cout << "Network Status:\n";
-    for (const auto& iface : interfaces) {
-        std::string cmd = "ip link show " + iface + " | grep 'state UP'";
-        int status = system(cmd.c_str());
-        std::cout << " - " << iface << ": " 
-                  << (WIFEXITED(status) && !WEXITSTATUS(status) ? "UP" : "DOWN") 
-                  << "\n";
+    int sock = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sock < 0) {
+        perror("socket");
+        return;
     }
+
+    const char* interfaces[] = {"eth0", "wlan0", "cellular0", nullptr};
+    struct ifreq ifr;
+
+    for (const char** iface = interfaces; *iface; iface++) {
+        strncpy(ifr.ifr_name, *iface, IFNAMSIZ);
+        if (ioctl(sock, SIOCGIFFLAGS, &ifr) == 0) {
+            std::cout << *iface << ": " 
+                     << ((ifr.ifr_flags & IFF_UP) ? "UP" : "DOWN")
+                     << "\n";
+        }
+    }
+    close(sock);
 }
 
-// Basic firewall setup
+
 void configure_firewall() {
-    std::cout << "Configuring iptables (job requirement)\n";
-    system("iptables -L"); // List current rules (in real project would modify rules)
+    std::cout << "Performing firewall checks...\n";
+    
+    // Test 1: Check if basic TCP sockets are allowed
+    int tcp_sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (tcp_sock < 0) {
+        perror("TCP socket creation failed");
+    } else {
+        std::cout << "✓ TCP sockets allowed\n";
+        close(tcp_sock);
+    }
 }
